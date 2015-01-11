@@ -1,14 +1,12 @@
  # -*- coding: utf-8 -*-
-from Agent import Agent
+from Agent.Agent import Agent
 
 import networkx as nx
 import random
-
+from statistics import mean, median, mode, stdev
 # Drawing
 import pylab
 import matplotlib.font_manager
-import matplotlib.pyplot as plt
-from matplotlib.pyplot import pause
 
 pylab.ion()
 pylab.show()
@@ -44,20 +42,33 @@ def draw_graph(G, colors, labels, layout=nx.shell_layout):
     pylab.draw()
 
 
-def default_replace_vertex(NW, a, other_agent=None, info=None):
-    if other_agent == None:
-        other_agent = random.choice(NW.get_vertices())
-    a.morph_agent(other_agent)
+def default_replace_vertex(NW, agent, replacement=None):
+    replacement = replacement or random.choice(NW.get_vertices())
+    agent.morph_agent(replacement)
 
-def default_weighting(a):
-    return a.get_fitness()
+def default_weighting(agent):
+    return agent.get_fitness()
+
+def default_get_info(agents):
+    agent_info = {'count':{}}
+    for a in agents:
+        agent_info['count'][a.get_name()] = agent_info['count'][a.get_name()] + 1 if a.get_name() in agent_info['count'] else 1
+        for (k, v) in a.get_info().items():
+            if k not in agent_info:
+                agent_info[k] = {}
+
+            if a.get_name() in agent_info[k]: 
+                agent_info[k][a.get_name()].append(v)
+            else:
+                agent_info[k][a.get_name()] = [v]
+    return agent_info
 
 class Network:
     # If pass in N creates network of N cooperators
     # If pass in agents creates network with agents
     # If pass in inital networkx graph G, creates NW with that graph
     # If pass in NW, creates network with that NW
-    def __init__(self, N=10, agents=None, G=None, NW=None, layout='spectral_layout'):
+    def __init__(self, N=10, agents=None, G=None, NW=None, layout='spectral_layout', get_info=None):
         if NW:
             self.G = NW.G
         elif G:
@@ -70,11 +81,11 @@ class Network:
             self.G = nx.Graph()
             self.G.add_nodes_from(agents)
 
-        self.info = {}
+        self.get_info_func = get_info or default_get_info
         self.layout = layout
 
-    def get_agent(self, a):
-        return a
+    def get_agent(self, agent):
+        return agent
 
     def get_num_vertices(self):
         return self.G.number_of_nodes()
@@ -112,12 +123,15 @@ class Network:
     def get_random_vertex(self):
         return random.choice(self.get_vertices())
 
-    def get_random_vertex_not_equal(self, agent):
-        v = self.get_random_vertex()
-        while v == agent:
-            v = self.get_random_vertex()
+    def get_random_vertex_not_equal_to_agent(self, agent=None):
+        v1 = self.get_random_vertex()
+        if v1 == agent and self.get_num_vertices() == 1:
+            return None
 
-        return v
+        while v1 == agent:
+            v1 = self.get_random_vertex()
+
+        return v1
 
     def get_weighted_random_vertex(self, f=default_weighting):
         total_fitness = sum([f(a) for a in self.get_vertices_iter()])
@@ -135,8 +149,8 @@ class Network:
     def get_deaths(self):
         return [a for a in self.get_vertices_iter() if a.has_died()]
 
-    def neighbors(self, a):
-        return self.G.neighbors(a)
+    def neighbors(self, agent):
+        return self.G.neighbors(agent)
 
     def add_edge(self, a1, a2):
         a1 = self.get_agent(a1)
@@ -166,54 +180,46 @@ class Network:
             for i in xrange(N):
                 self.add_vertex()
 
-    def remove_vertex(self, a=None):
-        a = a or self.get_random_vertex()
+    def remove_vertex(self, agent=None):
+        agent = agent or self.get_random_vertex()
 
         for v in self.get_vertices_iter():
-            v.removed_agent(a)
+            v.removed_agent(agent)
 
-        self.G.remove_node(a)
+        self.G.remove_node(agent)
 
-        del a
+        del agent
 
     def remove_vertices(self, agents):
         for a in agents:
             self.remove_vertex(a)
 
-    def replace_vertex(self, a, replace=default_replace_vertex, replacement=None, info=None, delete_history=True):
-        replace(self, a, replacement, info)
+    def replace_vertex(self, agent, replace=default_replace_vertex, replacement=None, delete_history=True):
+        replace(NW=self, agent=agent, replacement=replacement)
         if delete_history:
             for v in self.get_vertices_iter():
-                v.removed_agent(a)
+                v.removed_agent(other_agent=agent)
 
-
-    def replace_vertices(self, agents, replace=default_replace_vertex, replacements=None, info=None, delete_history=True):
-        if replacements and info:
+    def replace_vertices(self, agents, replace=default_replace_vertex, replacements=None, delete_history=True):
+        if replacements:
             for i, a in enumerate(agents):
-                self.replace_vertex(a=a, replace=replace, replacement=replacements[i], info=info[i], delete_history=delete_history)
-        elif replacements and not info:
-            for i, a in enumerate(agents):
-                self.replace_vertex(a=a, replace=replace, replacement=replacements[i], delete_history=delete_history)            
+                self.replace_vertex(agent=a, replace=replace, replacement=replacements[i], delete_history=delete_history)            
         else:
             for a in agents:
-                self.replace_vertex(a=a, replace=replace, delete_history=delete_history)
+                self.replace_vertex(agent=a, replace=replace, delete_history=delete_history)
 
-    def update(self, f, t=-1):
-        f(NW=self, t=t)
+    # Updates the network according to a function f
+    def update(self, rewire, t=-1):
+        rewire(NW=self, t=t)
 
-    def get_info(self):        
-        self.info = {'count':{}}
-        for a in self.get_vertices_iter():
-            if a.name in self.info['count']:
-                self.info['count'][a.name] += 1
-            else:
-                self.info['count'][a.name] = 1
-
+    # Gets NW information. Total c, total d, cluster coefficient, etc.
+    def get_info(self, t=-1):
+        self.info = {'agent_information':self.get_info_func(self.get_vertices())}
         self.info['cc'] = "%.2f"%nx.average_clustering(self.G)
         return self.info
 
     def __str__(self):
-        return str([v.name for v in self.G.nodes()]) +'\n' + str([(v1.name, v2.name) for (v1, v2) in self.G.edges()])
+        return str([a.get_name() for a in self.get_vertices_iter()]) +'\n' + str([(a1.get_name(), a2.get_name()) for (a1, a2) in self.get_edges_iter()])
 
     def draw_NW(self, layout=None):
         self.layout = layout or self.layout
@@ -228,23 +234,28 @@ class Network:
         colors = []
         labels = {}
 
+        fitnesses = [a.get_fitness() for a in self.get_vertices_iter()]
+        average_fitness = mean(fitnesses)
+        std_fitness = stdev(fitnesses)
+
         for a in self.get_vertices_iter():
-            colors.append(a.get_color())
+            colors.append(a.get_color(avg=average_fitness, std=std_fitness))
             labels[a] = a.get_label()
         
         draw_graph(G=self.G, colors=colors, labels=labels, layout=LO)
 
     def print_edges(self):
-        print [(a1.name, a2.name) for (a1, a2) in self.get_edges()]
+        print [(a1.get_name(), a2.get_name()) for (a1, a2) in self.get_edges_iter()]
         
+    # Prints vertices
     def print_vertices(self):
-        print [v.name for v in self.get_vertices()]
+        print [a.get_name() for a in self.get_vertices_iter()]
 
+    # Prints NW
     def print_nw(self):
         self.print_vertices()
         self.print_edges()
 
 if __name__ == "__main__":
     nw = Network()
-    nw.draw_NW()
-    pause(5)
+    nw.print_nw()

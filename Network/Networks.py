@@ -1,13 +1,13 @@
  # -*- coding: utf-8 -*-
 
 from Network import Network
-from Agents import *
+from Agent.Agents import *
 import networkx as nx
 
 import random 
 
-def default_get_random_agent(i=0, N=20, types=None):
-    return random_agent(types=types)
+def default_get_random_agent(i=0, N=20):
+    return random_agent()
 
 def default_get_cooperator(i=0, N=20):
     return cooperator()
@@ -27,8 +27,8 @@ def circular_graph(N=10, get_agent=default_get_circular_agent):
 
     return G
 
-def random_graph(N=10, num_edges=10, get_agent=default_get_random_agent, types=None):
-    agents = [get_agent(i=i, N=N, types=types) for i in xrange(N)]
+def random_graph(N=10, num_edges=10, get_agent=default_get_random_agent):
+    agents = [get_agent(i=i, N=N) for i in xrange(N)]
 
     G = nx.Graph()
     G.add_nodes_from(agents)
@@ -45,11 +45,19 @@ def random_graph(N=10, num_edges=10, get_agent=default_get_random_agent, types=N
 
     return G
 
+def get_agent_random_types(types=[cooperator]):
+    def get_agent(i, N):
+        return random_agent(types=types)
+    return get_agent
+
 def random_graph_with_agent_types(N=10, num_edges=10, types=None):
-    return random_graph(N=N, num_edges=num_edges, get_agent=default_get_random_agent, types=types)
+    return random_graph(N=N, num_edges=num_edges, get_agent=get_agent_random_types(types=types))
 
 def random_graph_with_CD(N=10, num_edges=10):
     return random_graph_with_agent_types(N=N, num_edges=num_edges, types=[cooperator, defector])
+
+def random_graph_with_FM_CD(N=10, num_edges=10):
+    return random_graph_with_agent_types(N=N, num_edges=num_edges, types=[FM_agent_cooperator, FM_agent_defector])
 
 def complete_graph(N=10, get_agent=default_get_cooperator):
     agents = [get_agent(i, N) for i in xrange(N)]
@@ -59,17 +67,17 @@ def complete_graph(N=10, get_agent=default_get_cooperator):
             G.add_edge(agents[i], agents[j])
     return G
 
-def complete_graph_with_agent(N=10, get_agent=cooperator):
-    def get_agent_at_index(i, N):
-        return get_agent()
+def complete_graph_with_agent_types(N=10, types=None):
+    return complete_graph(N=N, get_agent=get_agent_random_types(types=types))
 
-    return complete_graph(N=N, get_agent=get_agent_at_index)
+def complete_graph_with_agent(N=10, agent_type=cooperator):
+    return complete_graph_with_agent_types(N=N, types=[agent_type])
 
 def complete_graph_cooperators(N=10):
-    return complete_graph_with_agent(N=N, get_agent=cooperator)
+    return complete_graph_with_agent(N=N, agent_type=cooperator)
 
 def complete_graph_defectors(N=10):
-    return complete_graph_with_agent(N=N, get_agent=defector)
+    return complete_graph_with_agent(N=N, agent_type=defector)
 
 def complete_graph_random_agents(N=10):
-    return complete_graph_with_agent(N=N, get_agent=random_agent)
+    return complete_graph_with_agent(N=N, agent_type=random_agent)
