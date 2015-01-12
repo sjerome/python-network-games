@@ -235,8 +235,9 @@ class Network:
         labels = {}
 
         fitnesses = [a.get_fitness() for a in self.get_vertices_iter()]
+
         average_fitness = mean(fitnesses)
-        std_fitness = stdev(fitnesses)
+        std_fitness = stdev(fitnesses if len(fitnesses) > 1 else .01)
 
         for a in self.get_vertices_iter():
             colors.append(a.get_color(avg=average_fitness, std=std_fitness))

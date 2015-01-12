@@ -46,7 +46,7 @@ def NC(N=20, reset=None):
 
 		if random.random() < .1:
 			if random.random() < .5:
-				NW.add_vertex(agent=random_agent())
+				NW.add_vertex(agent=random_agent([cooperator, defector]))
 			else:
 				if NW.get_num_vertices() >=2:
 					NW.remove_vertex(agent=NW.get_random_vertex())

@@ -5,9 +5,7 @@ from Agent.Agent import Agent
 import random
 
 def default_rewire(NW, t=-1):
-	NW.replace_vertices(zp.deaths)
-	zp.set_deaths(set([]))
-	
+	NW.replace_vertices(NW.get_deaths())	
 	(a1, a2) = NW.get_random_edge()
 
 	if NW.has_edge(a1=a1, a2=a2): 

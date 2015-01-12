@@ -49,7 +49,8 @@ def default_update(self, other_agent, s, t=-1):
 	self.set_payoff(payoff=self.get_payoff()+self.U(a1=self, a2=other_agent, s=s)[self])
 
 def default_step(self, t=-1):
-	self.set_payoff(payoff=self.get_payoff())
+	self.set_payoff(payoff=self.get_payoff()-.01)
+	return
 
 def default_get_color(self, avg=None, std=None, t=-1):
 		avg = avg or 1
@@ -77,7 +78,7 @@ class Agent:
 	def __init__(self, name='C', kind=.5, behavior=default_get_behavior, payoff=default_payoff, 
 		label=default_get_label, should_add = default_should_add, should_remove = default_should_remove,
 		fitness=default_fitness, child=default_get_child, update=default_update, tire=default_step, get_color=default_get_color,
-		info=None, selection=.5):
+		info=None, selection=1):
 
 		self.name = str(name)
 		self.type = kind
@@ -137,12 +138,16 @@ class Agent:
 	def get_behavior_function(self):
 		return self.behavior
 
+
 	## REALY SHOULD NEVER BE USED UNLESS FOR DEFINING FITNESS FUNCTION, USE FITNESS TO ABSTRACT UTILITY
 	def get_payoff(self):
 		return self.total_payoff
 
 	def has_died(self):
 		return not self.alive
+
+	def is_alive(self):
+		return self.alive
 
 	def reset_utility(self):
 		self.set_payoff(0.0)

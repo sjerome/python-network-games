@@ -4,7 +4,6 @@ from Labels import *
 from Addings import *
 import random
 
-
 def cooperator():
 	return Agent(name='C', behavior=cooperate)
 
