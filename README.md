@@ -18,7 +18,7 @@ sudo easy_install pip
 pip install -r requirements.txt   
 python main.py  
 
-To build a simulation:
+To build a simulation:  
 Choose some agents. The agents currently available can be found in Agents.py. Add to the list!  
 Go to Simulations.py, and create a simulation. A simulation generally takes in as parameters and updating function,
 and an initial configuration.  
