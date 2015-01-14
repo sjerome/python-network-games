@@ -3,7 +3,7 @@ python-network-games
 
 A framework to create simulations for strategic agents on a dynamic network <br />
 
-To run on a linux based machine: <br />
+To run on a mac or linux based machine: <br />
 1) Download the entire directory from GitHub. <br />
 2) Check if pip is installed on the machine (type "which pip" into terminal. If a directory shows up, proceed to step 4.) <br />
 3) Install pip. To do so, run the command: "sudo easy_install pip". <br />
