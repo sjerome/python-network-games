@@ -10,7 +10,7 @@ To run on a linux based machine:
 4) Download the requirements (the ones included in requirements.txt). To do so, run the command "pip install -r requirements.txt". This may take some time, matplotlib has a lot of functionality and is a moderately large dependency.
 5) Run the simulation by typing python main.py
 
-Or, just copy and paste this into terminal:
+Or, just type these next few lines into terminal:
 git clone git@github.com:sjerome/python-network-games.git
 cd python-network-games
 sudo easy_install pip
@@ -22,4 +22,4 @@ Choose some agents. The agents currently available can be found in Agents.py. Ad
 Go to Simulations.py, and create a simulation. A simulation generally takes in as parameters and updating function,
 and an initial configuration. 
 
-If there are any questions, please feel free to email me at sjerome@princeton.edu
+If there are any questions, please feel free to email me at sjerome@princeton.edu.
