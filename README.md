@@ -14,7 +14,7 @@ Or, just type these next few lines into terminal: <br />
 git clone git@github.com:sjerome/python-network-games.git <br />
 cd python-network-games <br />
 sudo easy_install pip <br />
-pip install -r requirements.txt <br />
+pip install -r requirements.txt 
 python main.py <br />
 
 To build a simulation:
