@@ -26,10 +26,17 @@ def defector_with_mistakes(p=.1):
 	return Agent(name='CM', behavior=behavior)
 
 def FM_agent_cooperator(p=None):
-	return Agent(name='C', kind=0, label=get_label_with_p, behavior=cooperate, should_add=FM_should_add, info={'p':p or random.uniform(0, 10)})
+	return Agent(name='C', plot_color='b', kind=0, label=get_label_with_p, behavior=cooperate, should_add=FM_should_add, info={'p':p or max(0, random.gauss(.5, .4))})
 
 def FM_agent_defector(p=None):
-	return Agent(name='D', kind=1, label=get_label_with_p, behavior=defect, should_add=FM_should_add, info={'p':p or random.uniform(0, 10)})
+	return Agent(name='D', kind=1, plot_color='r', label=get_label_with_p, behavior=defect, should_add=FM_should_add, info={'p':p or max(0, random.gauss(.5, .4))})
+
+def FM_agent_cooperator_S(p=None):
+	return Agent(name='CS', kind=0, label=get_label_with_p, behavior=cooperate, should_add=FM_S_should_add, info={'p':p or max(0, random.gauss(0, 2))})
+
+def FM_agent_defector_S(p=None):
+	return Agent(name='DS', kind=1, label=get_label_with_p, behavior=defect, should_add=FM_S_should_add, info={'p':p or max(0, random.gauss(0, 2))})
+
 
 # Random agents
 def random_agent(types=None):

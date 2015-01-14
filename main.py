@@ -5,23 +5,29 @@ import pylab as plt
 import itertools
 from statistics import mean, median, mode, stdev
 
+LOG_PS = True
+DRAW_PS = True
 
-draw_scale = 30
+draw_scale = 10
 print_scale = draw_scale
+
 # One of these should always be 1
 play_scale = 1
 rewire_scale = 1
-log_scale = 1
+
+N = 50
 
 if __name__ == "__main__":
-	sim = FM(N=20)
-	N = 1
+	sim = FM(N=N)
+
 	information = {'times':[]}
-	for i in xrange(N):
+	for i in xrange(1):
 		peoples = {}
-		cc = []
-		ps = []
-		for t in xrange(2000): #itertools.count(0):
+		cc = ([],[])
+		if LOG_PS:
+			ps = {'AVG': ([],[])}
+
+		for t in xrange(1000): #itertools.count(0):
 			if t % play_scale == 0:
 				sim.play(t=t)
 
@@ -35,56 +41,74 @@ if __name__ == "__main__":
 			if t % print_scale == 0:
 				info = sim.get_info()
 				counts = info['agent_information']['count']
+				
 				for (k, v) in counts.items():
-					if k not in peoples:
-						peoples[k] = ([t], [v])
+					if k in peoples:
+						peoples[k][1].append(counts[k])
+						peoples[k][0].append(t)
 					else:
-						(times, cnt) = peoples[k]
-						cnt.append(v)
-						times.append(t)
+						peoples[k] = ([t],[counts[k]])
 
-				cc.append(info['cc'])
+				cc[0].append(t)
+				cc[1].append(info['cc'])
+				print t, info['cc']
 
-				pees = info['agent_information']['p']
-				ps.append(mean(reduce(lambda x,y: x+y,pees.values())))
-				# cs.append(info['agent_information']['count']['C'] if 'C' in info['agent_information']['count'] else 0)
-				# ds.append(info['agent_information']['count']['D'] if 'D' in info['agent_information']['count'] else 0)
+				if LOG_PS:
+					pees = info['agent_information']['p']
+					avg_p = mean(reduce(lambda x,y: x+y,pees.values()))
 
-				# plt.figure(1)
-				# plt.clf()
-				# ps = info['agent_information']['p']
-				# plt.boxplot(x=ps.values(), labels=ps.keys(), showmeans=True)
-				# plt.draw()
-				# plt.figure(1)
+					ps['AVG'][0].append(t)
+					ps['AVG'][1].append(avg_p)
+					
+					for (k, v) in pees.items():
+						if k in ps:
+							ps[k][1].append(mean(v))
+							ps[k][0].append(t)
+						else:
+							ps[k] = ([t],[mean(v)])
+
+					if DRAW_PS:
+						plt.figure(1)
+						plt.clf()
+						(keys, values) = (pees.keys(), pees.values())
+						keys.append('Whole-Population')
+						values.append([reduce(lambda x,y: x+y,pees.values())])
+						plt.boxplot(x=values, labels=keys, showmeans=True)
+						
+						plt.ylabel('p-values')
+						plt.xlabel('Agent Types')
+						
+						plt.ylim([-.2,3])
+						plt.draw()
+						plt.figure(1)
 
 				# print info['agent_information']['count'], info['cc'],mean(reduce(lambda x,y: x+y,ps.values())),  str(t)
 
 		plt.close()
+
+		fig = plt.figure()
+		ax1 = fig.add_subplot(311 if LOG_PS else 211)
 		for (k, v) in peoples.items():
-			if k == 'C':
-				c = 'b'
-			elif k == 'D':
-				c = 'r'
-			else:
-				c = 'g'
-			plt.plot(*v, color=c, label=k)
-		plt.legend()
-		plt.xlabel('t')
-		plt.ylabel('Population')
-		plt.show()
-		raw_input()
-		plt.close()
-		plt.plot(cc, label='C.C.')
-		plt.legend()
-		plt.xlabel('t')
-		plt.ylabel('Clustering Coefficient')
-		plt.show()
-		raw_input()
-		plt.close()
-		plt.plot(ps)
-		plt.legend()
-		plt.xlabel('t')
-		plt.ylabel('Average P')
+			c = 'b' if k == 'C' else 'r' if k == 'D' else (random.random(), random.random(), random.random())
+			ax1.plot(*v, color=c, label=k)
+		ax1.legend(prop={'size':11})
+		ax1.set_ylabel('Population')
+
+		if LOG_PS:
+			ax2 = fig.add_subplot(312)
+			for (k, v) in ps.items():
+				print v
+				c = 'b' if k == 'C' else 'r' if k == 'D' else (random.random(), random.random(), random.random())
+				ax2.plot(*v, color=c, label=k)
+			ax2.legend(prop={'size':10})
+			ax2.set_xlabel('time')
+			ax2.set_ylabel('average-p')
+
+		ax3 = fig.add_subplot(313 if LOG_PS else 212)	
+		ax3.plot(*cc, color='k')
+		ax3.set_xlabel('t')
+		ax3.set_ylabel('Clustering Coefficient')
+		
 		plt.show()
 		raw_input()
 

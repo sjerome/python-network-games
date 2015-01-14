@@ -7,13 +7,13 @@ import copy
 # Default payoff...b=.05, c=.03
 def default_payoff(a1, a2, s):
 	if s[a1] == 'C' and s[a2] == 'C':
-		return {a1:.02, a2:.02}
+		return {a1:1, a2:1}
 	elif s[a1] == 'C' and s[a2] == 'D':
-		return {a1:-.03, a2:.05}
+		return {a1:-1, a2:2}
 	elif s[a1] == 'D' and s[a2] == 'C':
-		return {a1:.05, a2:-.03}
+		return {a1:2, a2:-1}
 	elif s[a1] == 'D' and s[a2] == 'D':
-		return {a1:0.0, a2:0.0}
+		return {a1:-.3, a2:-.3}
 	else:
 		return None
 
@@ -33,17 +33,17 @@ def default_should_remove(self, other_agent, cost=0):
 
 def default_get_child(self, name=None, kind=None, behavior=None, payoff=None, label=None, should_add=None,
 	should_remove=None, fitness=None, child=None, update=None, tire=None, get_color=None, new_info=None,
-	selection=None):
+	selection=None, plot_color=None):
 
 	return Agent(name= (name or self.name), kind=(kind or self.type), behavior= (behavior or self.behavior),\
 		payoff = (payoff or self.U), label=(label or self.label), should_add = (should_add or self.would_add),\
 		should_remove=(should_remove or self.would_remove), fitness=(fitness or self.fitness),\
 		child = (child or self.child), update= (update or self.up), tire=(tire or self.step),\
 		info=(new_info or self.info), get_color=(get_color or self.color_func),\
-		selection=(selection or self.selection))
+		selection=(selection or self.selection), plot_color=(plot_color or self.plot_color))
 
 def default_fitness(self, t=-1):
-	return 1 + self.get_selection() * self.get_payoff()
+	return max(0.01, 1 + self.get_selection() * self.get_payoff())
 
 def default_update(self, other_agent, s, t=-1):
 	self.set_payoff(payoff=self.get_payoff()+self.U(a1=self, a2=other_agent, s=s)[self])
@@ -78,7 +78,7 @@ class Agent:
 	def __init__(self, name='C', kind=.5, behavior=default_get_behavior, payoff=default_payoff, 
 		label=default_get_label, should_add = default_should_add, should_remove = default_should_remove,
 		fitness=default_fitness, child=default_get_child, update=default_update, tire=default_step, get_color=default_get_color,
-		info=None, selection=1):
+		info=None, selection=.08, plot_color='b'):
 
 		self.name = str(name)
 		self.type = kind
@@ -92,6 +92,7 @@ class Agent:
 		self.up = update
 		self.step = tire
 		self.color_func = get_color
+		self.plot_color = plot_color
 
 		self.alive = True
 		self.history = {}
@@ -138,6 +139,8 @@ class Agent:
 	def get_behavior_function(self):
 		return self.behavior
 
+	def get_plot_color(self):
+		return self.plot_color
 
 	## REALY SHOULD NEVER BE USED UNLESS FOR DEFINING FITNESS FUNCTION, USE FITNESS TO ABSTRACT UTILITY
 	def get_payoff(self):
@@ -202,6 +205,7 @@ class Agent:
 		self.child = other_agent.child
 		self.color_func = other_agent.color_func
 		self.selection = other_agent.selection
+		self.plot_color = other_agent.plot_color
 
 		self.info = new_info or copy.deepcopy(other_agent.info)
 		self.history = new_history or {}
