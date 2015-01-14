@@ -11,7 +11,7 @@ To run on a mac or linux based machine:
 4) Download the requirements (the ones included in requirements.txt). To do so, run the command "pip install -r requirements.txt". This may take some time, matplotlib has a lot of functionality and is a moderately large dependency.  
 5) Run the simulation by typing python main.py  
 
-Or, just type these next few lines into terminal:   
+Or, if you don't want to read that, just copy and paste these next few lines into terminal:   
 git clone git@github.com:sjerome/python-network-games.git   
 cd python-network-games  
 sudo easy_install pip  
