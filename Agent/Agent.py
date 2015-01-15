@@ -2,7 +2,7 @@
 import random 
 import copy
 
-# Default Functions
+# Default Function
 
 # Default payoff...b=.05, c=.03
 def default_payoff(a1, a2, s):
@@ -24,8 +24,7 @@ def default_get_label(self):
 	return self.name + "%.2f"%self.get_fitness()
 
 def default_should_add(self, other_agent, cost=0):
-	return (self != other_agent and (not self.get_history(other_agent=other_agent).get('actions') or\
-		self.get_history(other_agent=other_agent)['actions'][0][1] == 'C'))
+	return self != other_agent and not self.was_defected_by(other_agent=other_agent)
 
 def default_should_remove(self, other_agent, cost=0):
 	return not (not self.get_history(other_agent=other_agent).get('actions') or\
@@ -145,6 +144,9 @@ class Agent:
 	## REALY SHOULD NEVER BE USED UNLESS FOR DEFINING FITNESS FUNCTION, USE FITNESS TO ABSTRACT UTILITY
 	def get_payoff(self):
 		return self.total_payoff
+
+	def was_defected_by(self, other_agent):
+		return self.get_history(other_agent=other_agent).get('actions') and self.get_history(other_agent=other_agent)['actions'][0][1] == 'D'
 
 	def has_died(self):
 		return not self.alive

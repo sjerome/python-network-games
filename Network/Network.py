@@ -123,6 +123,9 @@ class Network:
     def get_random_vertex(self):
         return random.choice(self.get_vertices())
 
+    def get_random_vertices(self, n=1):
+        return random.sample(self.get_vertices(), n)
+
     def get_random_vertex_not_equal_to_agent(self, agent=None):
         v1 = self.get_random_vertex()
         if v1 == agent and self.get_num_vertices() == 1:

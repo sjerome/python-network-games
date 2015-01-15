@@ -93,7 +93,7 @@ def BD(N=20, reset=1):
 
 	return Simulation(G=circular_graph(N=N), rewire=BD_updating, layout='spectral_layout', reset=reset)
 
-def FM(N=20, num_edges=50, u=.05, epsilon=.01, mutation_rate=.05, reset=1):
+def FM(N=20, num_edges=50, u=.05, epsilon=.01, anomaly_rate=.02, reset=1):
 	def FM_updating(NW, t=-1):
 		v1 = NW.get_random_vertex()
 		p = v1.get_info()['p']
@@ -124,10 +124,54 @@ def FM(N=20, num_edges=50, u=.05, epsilon=.01, mutation_rate=.05, reset=1):
 				if v1.should_remove(other_agent=v2):
 					NW.remove_edge(a1=v1, a2=v2)
 			else:
-				if v1.should_add(other_agent=v2) and v2.should_add(other_agent=v1):
+				if v1.should_add(other_agent=v2):
 					NW.add_edge(a1=v1, a2=v2)
 
 	return Simulation(G=random_graph_with_agent_types(N=N, num_edges=num_edges, types=[FM_agent_defector, FM_agent_cooperator]), rewire=FM_updating, layout='shell_layout', reset=reset)
+
+
+def SM(N=20, num_edges=50, u=.05, epsilon=.01, anomaly_rate=.02, reset=1):
+	def FM_updating(NW, t=-1):
+		v1 = NW.get_random_vertex()
+		p = v1.get_info()['p']
+
+		if random.random() < anomaly_rate:
+			NW.remove_vertex(agent=v1)
+			new_agent = random_agent(types=[SM_agent_defector, SM_agent_cooperator])
+			new_neighbors = NW.get_random_vertices(n=random.randint(0, 5))
+			NW.add_vertex(agent=new_agent, neighbors=new_neighbors)
+			return
+
+		if random.random() < p:
+			picked = NW.get_weighted_random_vertex()
+			if random.random() < u:
+				clone = random_agent(types=[SM_agent_defector, SM_agent_cooperator])
+			else:
+				clone = picked.get_child()
+
+			p_role_model = picked.get_info()['p']
+
+			if p_role_model > p:
+				new_p = min(1, p+epsilon)
+			elif p_role_model < p:
+				new_p = max(0,p - epsilon)
+			else:
+				new_p = p
+				
+			replacement = clone.get_child(new_info={'p':new_p})
+
+			NW.replace_vertex(agent=v1, replacement=replacement)
+		else:
+			v2 = NW.get_random_vertex_not_equal_to_agent(agent=v1)
+
+			if NW.has_edge(a1=v1,a2=v2):
+				if v1.should_remove(other_agent=v2):
+					NW.remove_edge(a1=v1, a2=v2)
+			else:
+				if v1.should_add(other_agent=v2) and v2.should_add(other_agent=v1):
+					NW.add_edge(a1=v1, a2=v2)
+
+	return Simulation(G=random_graph_with_agent_types(N=N, num_edges=num_edges, types=[SM_agent_defector, SM_agent_cooperator]), rewire=FM_updating, layout='shell_layout', reset=reset)
 
 
 
