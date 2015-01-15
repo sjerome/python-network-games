@@ -8,7 +8,7 @@ from statistics import mean, median, mode, stdev
 LOG_PS = True
 DRAW_PS = True
 
-draw_scale = 10
+draw_scale = 50
 print_scale = draw_scale
 
 # One of these should always be 1
@@ -17,6 +17,7 @@ rewire_scale = 1
 
 N = 50
 
+T = 10000
 if __name__ == "__main__":
 	sim = FM(N=N)
 
@@ -27,7 +28,7 @@ if __name__ == "__main__":
 		if LOG_PS:
 			ps = {'AVG': ([],[])}
 
-		for t in xrange(1000): #itertools.count(0):
+		for t in xrange(T): #itertools.count(0):
 			if t % play_scale == 0:
 				sim.play(t=t)
 
