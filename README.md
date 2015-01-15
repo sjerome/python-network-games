@@ -14,7 +14,7 @@ The harder way:
 
 
 The easier way: 
-Open up terminal, and copy and paste these lines:
+Open up terminal, and copy and paste these lines:  
 git clone git@github.com:sjerome/python-network-games.git   
 cd python-network-games  
 sudo easy_install pip  
