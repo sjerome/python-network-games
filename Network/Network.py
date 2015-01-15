@@ -7,17 +7,22 @@ from statistics import mean, median, mode, stdev
 # Drawing
 import pylab
 import matplotlib.font_manager
+import matplotlib.pyplot as plt
 
-pylab.ion()
-pylab.show()
-
+# Assumes pos starts as None to draw at all
 pos = None
-def draw_graph(G, colors, labels, layout=nx.shell_layout):
-    pylab.clf()
 
+def draw_graph(G, colors, labels, layout=nx.shell_layout):
     global pos
     if not pos:
         pos = layout(G)
+        plt.figure('Simulation')
+        plt.show(block=False)
+
+
+    plt.figure('Simulation')
+    plt.clf()
+    
     try:
         nx.draw(G, pos, node_color=colors, node_size=1000, alpha=.8)
         nx.draw_networkx_labels(G,pos,labels=labels,font_family=matplotlib.font_manager.findSystemFonts(fontpaths=None, fontext='ttf')[11])
@@ -39,7 +44,7 @@ def draw_graph(G, colors, labels, layout=nx.shell_layout):
             nx.draw(G, pos, node_color=colors, node_size=1000, alpha=.8)
             nx.draw_networkx_labels(G,pos,labels=labels,font_family=matplotlib.font_manager.findSystemFonts(fontpaths=None, fontext='ttf')[11])
 
-    pylab.draw()
+    plt.draw()
 
 
 def default_replace_vertex(NW, agent, replacement=None):

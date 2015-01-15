@@ -25,11 +25,11 @@ def defector_with_mistakes(p=.1):
 	
 	return Agent(name='CM', behavior=behavior)
 
-def FM_agent_cooperator(p=None, mean=.5):
-	return Agent(name='C', plot_color='b', kind=0, label=get_label_with_p, behavior=cooperate, should_add=FM_should_add, info={'p':p or max(0, random.gauss(mean, .4))})
+def FM_agent_cooperator(p=None, mean=5.0/3.0, std=2.0/3.0):
+	return Agent(name='C', plot_color='b', kind=0, label=get_label_with_p, behavior=cooperate, should_add=FM_should_add, info={'p':p or max(0, random.gauss(mean, std))})
 
-def FM_agent_defector(p=None, mean=.5):
-	return Agent(name='D', kind=1, plot_color='r', label=get_label_with_p, behavior=defect, should_add=FM_should_add, info={'p':p or max(0, random.gauss(mean, .4))})
+def FM_agent_defector(p=None, mean=5.0/3.0, std=2.0/3.0):
+	return Agent(name='D', kind=1, plot_color='r', label=get_label_with_p, behavior=defect, should_add=FM_should_add, info={'p':p or max(0, random.gauss(mean, std))})
 
 def FM_agent_cooperator_S(p=None):
 	return Agent(name='CS', kind=0, label=get_label_with_p, behavior=cooperate, should_add=FM_S_should_add, info={'p':p or max(0, random.gauss(0, 2))})

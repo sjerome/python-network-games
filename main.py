@@ -6,8 +6,8 @@ import itertools
 from statistics import mean, median, mode, stdev
 
 DRAW_SIM = True
-LOG_PS = True
-DRAW_PS = True
+DRAW_PS = DRAW_SIM
+GRAPH_PS = True
 
 draw_scale = 50
 print_scale = draw_scale
@@ -24,8 +24,13 @@ if __name__ == "__main__":
 	sim = SM(N=N)
 	peoples = {}
 	cc = ([],[])
-	if LOG_PS:
+
+	if GRAPH_PS:
 		ps = {'AVG': ([],[])}
+
+	if DRAW_PS:
+		plt.figure('p-boxplots')
+		plt.show(block=False)
 
 	for t in xrange(T): #itertools.count(0):
 		if t % play_scale == 0:
@@ -51,11 +56,9 @@ if __name__ == "__main__":
 				plt.ylim([-.2,3])
 				plt.draw()
 
-			plt.figure('Simulation')
 			sim.draw(t=t)
 
 		if  t % print_scale == 0:
-			info = sim.get_info()
 			print t
 
 		if t % graph_scale == 0:
@@ -73,7 +76,7 @@ if __name__ == "__main__":
 			cc[1].append(info['cc'])
 			
 
-			if LOG_PS:
+			if GRAPH_PS:
 				pees = info['agent_information']['p']
 				avg_p = mean(reduce(lambda x,y: x+y,pees.values()))
 
@@ -94,14 +97,14 @@ if __name__ == "__main__":
 
 	fig = plt.figure('Final Results')
 
-	ax1 = fig.add_subplot(311 if LOG_PS else 211)
+	ax1 = fig.add_subplot(311 if GRAPH_PS else 211)
 	for (k, v) in peoples.items():
 		c = 'b' if k == 'C' else 'r' if k == 'D' else (random.random(), random.random(), random.random())
 		ax1.plot(*v, color=c, label=k)
 	ax1.legend(prop={'size':11})
 	ax1.set_ylabel('Population')
 
-	if LOG_PS:
+	if GRAPH_PS:
 		ax2 = fig.add_subplot(312)
 		for (k, v) in ps.items():
 			c = 'b' if k == 'C' else 'r' if k == 'D' else (random.random(), random.random(), random.random())
@@ -110,11 +113,10 @@ if __name__ == "__main__":
 		ax2.set_xlabel('time')
 		ax2.set_ylabel('average-p')
 
-	ax3 = fig.add_subplot(313 if LOG_PS else 212)	
+	ax3 = fig.add_subplot(313 if GRAPH_PS else 212)	
 	ax3.plot(*cc, color='k')
 	ax3.set_xlabel('t')
 	ax3.set_ylabel('Clustering Coefficient')
 	
-	plt.show()
-	raw_input()
+	plt.show(block=True)
 
