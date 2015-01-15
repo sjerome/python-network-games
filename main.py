@@ -17,8 +17,8 @@ graph_scale = print_scale
 play_scale = 1
 rewire_scale = 1
 
-N = 50
-T = 3000
+N = 20
+T = 1000
 
 if __name__ == "__main__":
 	sim = SM(N=N)
@@ -35,13 +35,10 @@ if __name__ == "__main__":
 			sim.rewire(t=t)
 
 		if DRAW_SIM and t % draw_scale == 0:
-			plt.figure(0)
-			sim.draw(t=t)
-
 			if DRAW_PS:
 				info = sim.get_info()
 				pees = info['agent_information']['p']
-				plt.figure(1)
+				plt.figure('p-boxplots')
 				plt.clf()
 				(keys, values) = (pees.keys(), pees.values())
 				keys.append('Whole-Population')
@@ -53,6 +50,9 @@ if __name__ == "__main__":
 				
 				plt.ylim([-.2,3])
 				plt.draw()
+
+			plt.figure('Simulation')
+			sim.draw(t=t)
 
 		if  t % print_scale == 0:
 			info = sim.get_info()
