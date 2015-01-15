@@ -13,7 +13,8 @@ The harder way:
 5) Run the simulation by typing python main.py  
 
 
-If you don't want to read that, here's the easier way. Open up terminal, and copy and paste these lines:  
+The easier way: 
+Open up terminal, and copy and paste these lines:
 git clone git@github.com:sjerome/python-network-games.git   
 cd python-network-games  
 sudo easy_install pip  
